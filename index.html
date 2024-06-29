@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Digital</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .container {
+            margin: 50px auto;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #444;
+        }
+        .button {
+            width: 35px;
+            height: 50px;
+            margin: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #666;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #888;
+        }
+        #lcd {
+            width: 100%;
+            height: 50px;
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: right;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #000;
+        }
+        .tutorial-button {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #888;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tutorial-button:hover {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="calculatorContainer">
+        <h1>Kalkulator Digital</h1>
+        <input type="text" id="lcd" readonly>
+        <form action="#" id="calculatorForm">
+            <div>
+                <button type="button" class="button" onclick="appendToLcd('1')">1</button>
+                <button type="button" class="button" onclick="appendToLcd('2')">2</button>
+                <button type="button" class="button" onclick="appendToLcd('3')">3</button>
+                <button type="button" class="button" onclick="appendToLcd('+')">+</button>
+                <button type="button" class="button" onclick="appendToLcd('-')">-</button><br>
+                <button type="button" class="button" onclick="appendToLcd('4')">4</button>
+                <button type="button" class="button" onclick="appendToLcd('5')">5</button>
+                <button type="button" class="button" onclick="appendToLcd('6')">6</button>
+                <button type="button" class="button" onclick="appendToLcd('*')">×</button>
+                <button type="button" class="button" onclick="appendToLcd('/')">/</button><br>
+                <button type="button" class="button" onclick="appendToLcd('7')">7</button>
+                <button type="button" class="button" onclick="appendToLcd('8')">8</button>
+                <button type="button" class="button" onclick="appendToLcd('9')">9</button>
+                <button type="button" class="button" onclick="appendToLcd('0')">0</button>
+                <button type="button" class="button" onclick="appendToLcd('.')">.</button><br>
+                <button type="button" class="button" onclick="appendToLcd('(')">(</button>
+                <button type="button" class="button" onclick="appendToLcd(')')">)</button>
+                <button type="button" class="button" onclick="clearLcd()">C</button>
+                <button type="button" class="button" onclick="eraseLcd()">Del</button><br><br>
+                <button type="button" class="button" onclick="appendSquareRoot()">√</button>
+                <button type="button" class="button" onclick="appendSquare()">x²</button>
+                <button type="button" class="button" onclick="appendCube()">x³</button>
+                <button type="button" class="button" onclick="appendToLcd('%')">%</button>
+                <button type="button" class="button" onclick="calculate()" style="width: 40px;">=</button><br>
+                <button type="button" class="tutorial-button" onclick="showTutorial()"><strong>!</strong></button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function appendToLcd(value) {
+            var lcd = document.getElementById('lcd');
+            lcd.value += value;
+        }
+
+        function appendSquareRoot() {
+            var lcd = document.getElementById('lcd');
+            lcd.value += '√(';
+        }
+
+        function appendSquare() {
+            var lcd = document.getElementById('lcd');
+            if (lcd.value.length > 0 && !isNaN(lcd.value[lcd.value.length - 1])) {
+                lcd.value += '**2';
+            } else {
+                alert("Masukkan angka terlebih dahulu.");
+            }
+        }
+
+        function appendCube() {
+            var lcd = document.getElementById('lcd');
+            if (lcd.value.length > 0 && !isNaN(lcd.value[lcd.value.length - 1])) {
+                lcd.value += '**3';
+            } else {
+                alert("Masukkan angka terlebih dahulu.");
+            }
+        }
+
+        function clearLcd() {
+            document.getElementById('lcd').value = '';
+        }
+
+        function eraseLcd() {
+            var lcd = document.getElementById('lcd');
+            lcd.value = lcd.value.slice(0, -1);
+        }
+
+        function calculate() {
+            var lcd = document.getElementById('lcd');
+            var expression = lcd.value;
+
+            // Ganti simbol √ dengan Math.sqrt
+            expression = expression.replace(/√\(/g, "Math.sqrt(");
+            // Ganti tanda persentase dengan operasi pembagian yang sesuai
+            expression = expression.replace(/(\d+(\.\d+)?)%/g, "($1/100)");
+
+            var result;
+            try {
+                result = Function('"use strict";return (' + expression + ')')();
+                if (isNaN(result) || !isFinite(result)) {
+                    result = 'Error';
+                }
+            } catch (error) {
+                result = 'Error';
+            }
+
+            lcd.value = result;
+        }
+
+        // Fungsi untuk menampilkan tutorial
+        function showTutorial() {
+            alert("Tutorial Penggunaan Kalkulator:\n\n" +
+                "1. Masukkan angka dengan menekan tombol angka.\n" +
+                "2. Gunakan tombol operasi (+, -, ×, /) untuk perhitungan.\n" +
+                "3. Gunakan tombol √ untuk akar kuadrat, x² untuk kuadrat, dan x³ untuk kubik.\n" +
+                "4. Tekan tombol = untuk melihat hasil perhitungan.\n" +
+                "5. Gunakan tombol C untuk menghapus semua input, dan Del (Delete) untuk menghapus karakter terakhir.\n" +
+                "6. Gunakan tanda kurung untuk mengatur prioritas operasi.\n" +
+                "7. Tekan tombol % untuk memasukkan persen.\n" +
+                "8. Jika perangkat digoyangkan, akan muncul pesan spesial.\n" +
+                "9. Jangan lupa untuk menggunakan penutup kurung setelah menggunakan akar kuadrat.\n" +
+                "10. ~Selamat Mencoba~.\n")
+        }
+
+        // Fungsi untuk menangani goyangan perangkat
+        window.addEventListener('devicemotion', handleMotion);
+
+        function handleMotion(event) {
+            var acceleration = event.accelerationIncludingGravity;
+            var threshold = 15; // Sesuaikan ambang batas untuk mendeteksi goyangan
+
+            if (Math.abs(acceleration.x) > threshold ||
+                Math.abs(acceleration.y) > threshold ||
+                Math.abs(acceleration.z) > threshold) {
+                showShakeMessage("I LOVE YOU");
+            }
+        }
+
+        function showShakeMessage(message) {
+            var lcd = document.getElementById('lcd');
+            lcd.value = message;
+            setTimeout(function() {
+                lcd.value = '';
+            }, 5000); // Pesan akan muncul selama 5 detik
+        }
+    </script>
+</body>
+</html>
